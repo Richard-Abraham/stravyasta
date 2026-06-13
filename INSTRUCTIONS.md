@@ -536,6 +536,90 @@ node scripts/ensure-bucket.mjs
 
 ---
 
+## Phase 7 — Production Readiness Gaps Closed
+
+### Webpack Admin URL Injection
+
+For multi-environment deployments, set `STRAPI_ADMIN_BACKEND_URL` at build time:
+
+```bash
+docker build \
+  --build-arg STRAPI_ADMIN_BACKEND_URL=https://api.yourdomain.com \
+  -t stravyasta .
+```
+
+Config in `src/admin/webpack.config.ts` injects it into the admin panel bundle.
+
+### PM2 Cluster Mode (Fallback)
+
+If deploying without Dokploy, use PM2:
+
+```bash
+pnpm add -g pm2
+pm2 start ecosystem.config.js --env production
+```
+
+This runs:
+- `strapi-api` — cluster mode (one worker per CPU), no MCP
+- `strapi-mcp` — fork mode, single instance, `ENABLE_MCP=true`
+
+### Container Vulnerability Scanning
+
+Every PR runs Trivy in CI to scan for HIGH/CRITICAL CVEs. The build fails if any are found. Config in `.github/workflows/ci.yml`.
+
+### Database Backup Script
+
+```bash
+# Before any schema migration in production:
+./scripts/backup-db.sh ./backups
+# Supports PostgreSQL (pg_dump) and SQLite
+# Creates: backups/strapi_20250101_120000.sql.gz
+```
+
+### PgBouncer (for 3+ compute nodes)
+
+When scaling to 3+ Strapi instances, configure PgBouncer between the application and PostgreSQL:
+
+```bash
+# docker-compose addition:
+pgbouncer:
+  image: edoburu/pgbouncer:latest
+  environment:
+    DB_HOST: db
+    DB_PORT: 5432
+    DB_USER: vyasta
+    DB_PASSWORD: vyasta
+    POOL_MODE: transaction
+    MAX_CLIENT_CONN: 200
+    DEFAULT_POOL_SIZE: 25
+  ports:
+    - "6432:5432"
+```
+
+Then set `DATABASE_HOST=pgbouncer` and `DATABASE_PORT=6432` in your services.
+
+---
+
+## Complete Test Report
+
+**72 tests, 11 suites, all passing:**
+
+| Suite | Tests |
+|---|---|
+| Health service | 3 |
+| Audit service | 3 |
+| Cache service | 6 |
+| Content service | 5 |
+| Media service | 5 |
+| MCP allowlist | 5 |
+| MCP tools (read) | 7 |
+| MCP tools (write) | 9 |
+| Security | 5 |
+| Build integrity | 6 |
+| Production readiness | 18 |
+
+---
+
 ## Repository
 
 **GitHub**: `https://github.com/Richard-Abraham/stravyasta`
