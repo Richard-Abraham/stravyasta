@@ -487,7 +487,7 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
   };
   options: {
     draftAndPublish: true;
-    reviewWorkflows: true;
+    reviewWorkflows: false;
   };
   pluginOptions: {
     i18n: {
@@ -646,7 +646,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
   };
   options: {
     draftAndPublish: true;
-    reviewWorkflows: true;
+    reviewWorkflows: false;
   };
   pluginOptions: {
     i18n: {

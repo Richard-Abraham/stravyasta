@@ -1,61 +1,36 @@
-# 🚀 Getting started with Strapi
+# Stravyasta
 
-Strapi comes with a full featured [Command Line Interface](https://docs.strapi.io/dev-docs/cli) (CLI) which lets you scaffold and manage your project in seconds.
-
-### `develop`
-
-Start your Strapi application with autoReload enabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-develop)
+Production-grade **Strapi 5 CMS** with DDD module structure, **MCP (Model Context Protocol)** integration for AI agent access, multi-stage Docker builds, Redis caching, GraphQL, and CI/CD.
 
 ```
-npm run develop
-# or
-yarn develop
+54 tests · 10 suites · All green
 ```
 
-### `start`
+## Quick Start
 
-Start your Strapi application with autoReload disabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-start)
-
-```
-npm run start
-# or
-yarn start
-```
-
-### `build`
-
-Build your admin panel. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-build)
-
-```
-npm run build
-# or
-yarn build
+```bash
+git clone https://github.com/Richard-Abraham/stravyasta.git
+cd stravyasta
+pnpm install && pnpm develop
+# Admin: http://localhost:1337/admin (admin@strapi.local / Str0ng!Admin#2026)
 ```
 
-## ⚙️ Deployment
+## Features
 
-Strapi gives you many possible deployment options for your project including [Strapi Cloud](https://cloud.strapi.io). Browse the [deployment section of the documentation](https://docs.strapi.io/dev-docs/deployment) to find the best solution for your use case.
+- **Content Management**: Articles, Pages, Categories, Tags, Navigation
+- **AI-Ready**: MCP server with 6 tools (read + write) for LLM agents
+- **Production Docker**: Multi-stage build (~400MB), PostgreSQL, Redis, S3
+- **Security**: CSP headers, CORS, audit logging, rate limiting, UID allowlist
+- **CI/CD**: GitHub Actions workflows for test + deploy
+- **Testing**: 54 vitest tests across all modules
 
-```
-yarn strapi deploy
-```
+## Docs
 
-## 📚 Learn more
+- `INSTRUCTIONS.md` — Full setup, deployment, and usage guide
+- `AGENTS.md` — Architecture decisions and feature checklist
+- `NOTES.md` — Implementation log
+- `AUDIT.md` — Security audit report
 
-- [Resource center](https://strapi.io/resource-center) - Strapi resource center.
-- [Strapi documentation](https://docs.strapi.io) - Official Strapi documentation.
-- [Strapi tutorials](https://strapi.io/tutorials) - List of tutorials made by the core team and the community.
-- [Strapi blog](https://strapi.io/blog) - Official Strapi blog containing articles made by the Strapi team and the community.
-- [Changelog](https://strapi.io/changelog) - Find out about the Strapi product updates, new features and general improvements.
+## Tech Stack
 
-Feel free to check out the [Strapi GitHub repository](https://github.com/strapi/strapi). Your feedback and contributions are welcome!
-
-## ✨ Community
-
-- [Discord](https://discord.strapi.io) - Come chat with the Strapi community including the core team.
-- [Forum](https://forum.strapi.io/) - Place to discuss, ask questions and find answers, show your Strapi project and get feedback or just talk with other Community members.
-- [Awesome Strapi](https://github.com/strapi/awesome-strapi) - A curated list of awesome things related to Strapi.
-
----
-
-<sub>🤫 Psst! [Strapi is hiring](https://strapi.io/careers).</sub>
+Strapi 5 · TypeScript · pnpm · PostgreSQL · Redis · Docker · GitHub Actions · MCP · GraphQL
