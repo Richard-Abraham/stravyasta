@@ -1,0 +1,34 @@
+{
+  "collectionName": "components_shared_seos",
+  "info": {
+    "displayName": "SEO",
+    "icon": "search",
+    "description": "Search engine optimization metadata"
+  },
+  "options": {},
+  "attributes": {
+    "metaTitle": {
+      "type": "string",
+      "required": false,
+      "maxLength": 60
+    },
+    "metaDescription": {
+      "type": "text",
+      "required": false,
+      "maxLength": 160
+    },
+    "ogImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "keywords": {
+      "type": "string"
+    },
+    "noIndex": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

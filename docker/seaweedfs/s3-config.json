@@ -1,0 +1,18 @@
+{
+  "identities": [
+    {
+      "name": "vyasta",
+      "credentials": [
+        {
+          "accessKey": "vyasta",
+          "secretKey": "vyastapass"
+        }
+      ],
+      "actions": ["Admin", "Read", "Write"]
+    },
+    {
+      "name": "anonymous",
+      "actions": ["Read"]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_navigation_items",
+  "info": {
+    "displayName": "Navigation Item",
+    "icon": "link",
+    "description": "A single navigation link item"
+  },
+  "options": {
+    "repeatable": true
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    },
+    "target": {
+      "type": "enumeration",
+      "enum": ["_self", "_blank"],
+      "default": "_self"
+    }
+  }
+}

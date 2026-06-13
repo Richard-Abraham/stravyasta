@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_shared_ctas",
+  "info": {
+    "displayName": "Call to Action",
+    "icon": "cursor",
+    "description": "Call to action block"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "description": {
+      "type": "text"
+    },
+    "buttonText": {
+      "type": "string",
+      "default": "Learn More"
+    },
+    "buttonUrl": {
+      "type": "string",
+      "required": true
+    },
+    "variant": {
+      "type": "enumeration",
+      "enum": ["primary", "secondary", "outline"],
+      "default": "primary"
+    }
+  }
+}

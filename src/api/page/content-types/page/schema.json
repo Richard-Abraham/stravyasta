@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pages",
+  "info": {
+    "singularName": "page",
+    "pluralName": "pages",
+    "displayName": "Page",
+    "description": "Content pages with layout blocks"
+  },
+  "options": {
+    "draftAndPublish": true,
+    "reviewWorkflows": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "pluginOptions": { "i18n": { "localized": true } }
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "excerpt": {
+      "type": "text",
+      "pluginOptions": { "i18n": { "localized": true } }
+    },
+    "layout": {
+      "type": "dynamiczone",
+      "components": ["shared.rich-text", "shared.image-gallery", "shared.cta", "shared.faq"],
+      "pluginOptions": { "i18n": { "localized": true } }
+    },
+    "seo": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.seo"
+    }
+  }
+}

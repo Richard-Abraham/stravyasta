@@ -1,0 +1,111 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vyasta
+      POSTGRES_PASSWORD: vyasta
+      POSTGRES_DB: strapi
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5545:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vyasta -d strapi"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  storage:
+    image: chrislusf/seaweedfs:latest
+    restart: unless-stopped
+    command: server -s3 -s3.config=/etc/seaweedfs/s3-config.json -dir=/data -master.volumeSizeLimitMB=1024
+    volumes:
+      - seaweeddata:/data
+      - ./docker/seaweedfs/s3-config.json:/etc/seaweedfs/s3-config.json:ro
+    ports:
+      - "8334:8333"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:9333 2>/dev/null || wget --no-verbose --tries=1 --spider http://localhost:8333 2>/dev/null || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+      start_period: 15s
+
+  maildev:
+    image: maildev/maildev
+    restart: unless-stopped
+    ports:
+      - "1081:1080"
+      - "1026:1025"
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  strapi:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "1337:1337"
+    env_file: .env
+    environment:
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_NAME: strapi
+      DATABASE_USERNAME: vyasta
+      DATABASE_PASSWORD: vyasta
+      AWS_ACCESS_KEY_ID: vyasta
+      AWS_ACCESS_SECRET: vyastapass
+      AWS_REGION: us-east-1
+      S3_ENDPOINT: http://storage:8333
+      S3_BUCKET: strapi-media
+      SMTP_HOST: maildev
+      SMTP_PORT: 1025
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      ENABLE_MCP: 'false'
+    depends_on:
+      db:
+        condition: service_healthy
+      storage:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  strapi-mcp:
+    build: .
+    profiles: ["mcp"]
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    env_file: .env
+    environment:
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_NAME: strapi
+      DATABASE_USERNAME: vyasta
+      DATABASE_PASSWORD: vyasta
+      ENABLE_MCP: 'true'
+      MCP_TRANSPORT: sse
+      MCP_PORT: '3001'
+      MCP_WRITE_ENABLED: 'true'
+      MCP_RATE_LIMIT: '60'
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  seaweeddata:

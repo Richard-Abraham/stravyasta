@@ -1,0 +1,64 @@
+{
+  "name": "cms",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A Strapi application",
+  "packageManager": "pnpm@10.30.1",
+  "scripts": {
+    "build": "strapi build",
+    "console": "strapi console",
+    "deploy": "strapi deploy",
+    "dev": "strapi develop",
+    "develop": "strapi develop",
+    "start": "strapi start",
+    "strapi": "strapi",
+    "upgrade": "npx @strapi/upgrade latest",
+    "upgrade:dry": "npx @strapi/upgrade latest --dry",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@strapi/plugin-cloud": "5.48.0",
+    "@strapi/plugin-graphql": "5.48.0",
+    "@strapi/plugin-sentry": "5.48.0",
+    "@strapi/plugin-users-permissions": "5.48.0",
+    "@strapi/provider-upload-aws-s3": "5.48.0",
+    "@strapi/strapi": "5.48.0",
+    "better-sqlite3": "^12.10.0",
+    "express": "^5.2.1",
+    "ioredis": "^5.11.1",
+    "pg": "^8.13.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.0.0",
+    "styled-components": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5",
+    "vitest": "^2.1.9"
+  },
+  "engines": {
+    "node": ">=20.0.0 <=24.x.x",
+    "npm": ">=6.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "esbuild",
+      "@swc/core",
+      "@apollo/protobufjs",
+      "better-sqlite3"
+    ]
+  },
+  "strapi": {
+    "uuid": "02109449-5605-472e-a8ab-b0b2ce0b1cd9",
+    "installId": "812c46447707587677ad49edc154fa9037c9f1d0543f7e28499723851397a72d"
+  }
+}
