@@ -600,6 +600,142 @@ Then set `DATABASE_HOST=pgbouncer` and `DATABASE_PORT=6432` in your services.
 
 ---
 
+## Architecture & Data Flow
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                        SYSTEM OVERVIEW                            │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Editor (Your Team)                                              │
+│       │                                                          │
+│       ▼                                                          │
+│  ┌──────────────────────┐                                        │
+│  │    STRAPI CMS         │   Frontend Devs (Your Team)            │
+│  │    (Admin Panel)      │       │                                │
+│  │    Port 1337          │       │ Builds UI in Next.js           │
+│  │    PostgreSQL backend │       ▼                                │
+│  └──────┬───────────────┘  ┌──────────────────────┐               │
+│         │  REST/GraphQL    │    FRONTEND (Next.js) │               │
+│         │  API calls       │    shadcn/ui, Tailwind│               │
+│         ▼                  │    Port 3000          │               │
+│  ┌──────────────────────┐  └──────┬───────────────┘               │
+│  │    MCP SERVER         │         │                               │
+│  │    (Port 3001)        │         ▼                               │
+│  │    AI agent access    │  ┌──────────────────────┐               │
+│  └──────────────────────┘  │    END USER            │               │
+│                            │    (Website Visitor)   │               │
+│                            └──────────────────────┘               │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+### Two Separate Apps, Deployed Independently
+
+| App | Deploy To | Port | Purpose |
+|---|---|---|---|
+| **Strapi CMS** | Dokploy (Docker) | 1337 | Content management, REST/GraphQL API, MCP for AI |
+| **Frontend (Next.js)** | Dokploy or Vercel | 3000 | Renders the actual website for visitors |
+
+They communicate via **HTTP API** only — no shared code, no shared database.
+
+---
+
+### What is Strapi? Who Uses It?
+
+**Strapi** is a **headless CMS** — a content management system that stores text, images, and
+structured data and serves it via APIs. It does NOT render websites.
+
+**Who uses the Strapi admin panel:**
+
+| Role | What They Do |
+|---|---|
+| **Content Editor** | Writes articles, uploads images, manages pages, SEO metadata |
+| **Admin** | Manages user permissions, API tokens, content type schemas |
+| **Developer** | Configures plugins, custom endpoints, deploys updates |
+
+**Who DOES NOT use Strapi:**
+- **End users / website visitors** — they never see Strapi. They see the frontend.
+
+---
+
+### Data Flow: Input to Output
+
+#### Flow 1 — Editor Creates Content
+```
+Editor logs into cms.yourdomain.com/admin
+        │
+        ▼
+Writes article in Strapi's Rich Text editor
+Adds images via Media Library
+Sets SEO metadata, category, tags
+        │
+        ▼
+Clicks Publish → Content saved to PostgreSQL
+        │
+        ▼
+Available via GET /api/articles?populate=*
+```
+
+#### Flow 2 — End User Visits the Site
+```
+Visitor opens vyasta.yourdomain.com
+        │
+        ▼
+Frontend (Next.js) fetches data from Strapi API:
+  GET https://cms.yourdomain.com/api/articles?populate=*
+  GET https://cms.yourdomain.com/api/pages?populate=layout
+  GET https://cms.yourdomain.com/api/navigation?populate=items
+        │
+        ▼
+Next.js renders JSON into styled React components
+  (shadcn/ui, Tailwind CSS, your brand colors/typography)
+        │
+        ▼
+Visitor sees a fully designed page with your brand identity
+```
+
+#### Flow 3 — AI Agent Manages Content (Optional)
+```
+Developer / Editor asks Claude: "Create 3 articles about AI"
+        │
+        ▼
+Claude calls Strapi MCP Server (via SSE or Stdio):
+  create_content_entry(uid:"api::article.article", data:{...})
+        │
+        ▼
+Content created in Strapi, available via API instantly
+```
+
+---
+
+### The Frontend Controls EVERYTHING Visual
+
+Strapi is **invisible to end users**. It only stores and serves data.
+
+| Visual Element | Controlled By |
+|---|---|
+| Colors, fonts, spacing | Frontend (Tailwind CSS) |
+| Page layout, components | Frontend (React components) |
+| Images, text content | Strapi (stored, served via API) |
+| Navigation structure | Strapi (API) → Frontend renders it |
+| SEO meta tags | Strapi (SEO component) → Frontend inserts in `<head>` |
+
+---
+
+### Strapi AI vs Our MCP — Two Different Things
+
+| Feature | Strapi AI (Built-in) | Our MCP Integration |
+|---|---|---|
+| What it does | Generates article text/content inside admin panel | Lets external AI agents query/manage content |
+| Requires API key? | Yes — Strapi Cloud ($29/mo) or OpenAI key | No — MCP is free, open standard |
+| Who uses it | Content editors writing articles | Developers, automated pipelines, AI agents |
+| Status | Not enabled (needs key) | ✅ Built, tested, running |
+
+**Our MCP is free and ready to use.** Strapi's built-in AI content generation requires a
+Strapi Cloud subscription or OpenAI key — we haven't enabled it.
+
+---
+
 ## Complete Test Report
 
 **72 tests, 11 suites, all passing:**
