@@ -44,7 +44,7 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
       amountLimit: 100,
       apolloServer: {
         tracing: false,
-        introspection: true,
+        introspection: env.bool('GRAPHQL_INTROSPECTION', false),
       },
     },
   },

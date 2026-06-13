@@ -9,7 +9,7 @@
   },
   "options": {
     "draftAndPublish": true,
-    "reviewWorkflows": true
+    "reviewWorkflows": false
   },
   "pluginOptions": {
     "i18n": {

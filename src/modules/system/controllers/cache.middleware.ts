@@ -1,7 +1,7 @@
 import type { Core } from '@strapi/strapi';
+import { createCacheService } from '../services/cache.service';
 
 export function createCacheMiddleware({ strapi }: { strapi: Core.Strapi }) {
-  const { createCacheService } = require('../services/cache.service');
   const cache = createCacheService({ strapi });
 
   const cachedMethods = ['GET'];
