@@ -11,6 +11,7 @@ import { runSystemAudit } from './tools/run-system-audit';
 import { createContentEntry } from './tools/create-content-entry';
 import { updateContentEntry } from './tools/update-content-entry';
 import { publishEntry } from './tools/publish-entry';
+import { validateMcpInput } from './validation';
 import type { ToolDefinition, ToolHandler } from './types';
 
 const READ_TOOLS = ['query_content_collection', 'get_collection_schema'];
@@ -154,6 +155,15 @@ export async function createMcpServer({ strapi }: { strapi: Core.Strapi }) {
     if (!handler) {
       return {
         content: [{ type: 'text', text: `Unknown tool: ${name}` }],
+        isError: true,
+      };
+    }
+
+    // Input validation
+    const validation = validateMcpInput(name, args);
+    if (!validation.valid) {
+      return {
+        content: [{ type: 'text', text: `Validation error: ${validation.errors.join('; ')}` }],
         isError: true,
       };
     }

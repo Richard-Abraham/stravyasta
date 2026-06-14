@@ -8,14 +8,14 @@ export default {
     },
     {
       method: 'GET',
-      path: '/articles/:id',
-      handler: 'article.findOne',
+      path: '/articles/slug/:slug',
+      handler: 'article.findBySlug',
       config: { auth: false },
     },
     {
       method: 'GET',
-      path: '/articles/slug/:slug',
-      handler: 'article.findBySlug',
+      path: '/articles/:id',
+      handler: 'article.findOne',
       config: { auth: false },
     },
   ],

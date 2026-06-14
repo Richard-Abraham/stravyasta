@@ -39,4 +39,21 @@ describe('CacheService', () => {
     const service = createCacheService({ strapi: mockStrapi() });
     await expect(service.invalidate('cache:api::article.*')).resolves.toBeUndefined();
   });
+
+  describe('per-content-type TTL', () => {
+    it('returns 600s for articles', () => {
+      const service = createCacheService({ strapi: mockStrapi() });
+      expect(service.getTtl('api::article.article')).toBe(600);
+    });
+
+    it('returns 3600s for categories', () => {
+      const service = createCacheService({ strapi: mockStrapi() });
+      expect(service.getTtl('api::category.category')).toBe(3600);
+    });
+
+    it('returns default 3600s for unknown types', () => {
+      const service = createCacheService({ strapi: mockStrapi() });
+      expect(service.getTtl('api::unknown.unknown')).toBe(3600);
+    });
+  });
 });

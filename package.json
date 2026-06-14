@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@strapi/plugin-cloud": "5.48.0",
     "@strapi/plugin-graphql": "5.48.0",
     "@strapi/plugin-sentry": "5.48.0",
     "@strapi/plugin-users-permissions": "5.48.0",

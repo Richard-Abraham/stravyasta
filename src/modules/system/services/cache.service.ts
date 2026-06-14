@@ -6,8 +6,17 @@ type CacheEntry = {
   timestamp: number;
 };
 
+const DEFAULT_TTL = 3600; // 1 hour
+
+const contentTypeTtls: Record<string, number> = {
+  'api::article.article': 600,   // 10 min — content changes frequently
+  'api::page.page': 600,          // 10 min
+  'api::navigation.navigation': 3600, // 1 hour — rarely changes
+  'api::category.category': 3600,
+  'api::tag.tag': 3600,
+};
+
 export function createCacheService({ strapi }: { strapi: Core.Strapi }) {
-  const ttl = 3600; // 1 hour default
   const redis = loadRedis();
 
   function loadRedis() {
@@ -44,7 +53,8 @@ export function createCacheService({ strapi }: { strapi: Core.Strapi }) {
     async set(key: string, entry: CacheEntry, customTtl?: number): Promise<void> {
       if (!redis) return;
       try {
-        await redis.set(key, JSON.stringify(entry), 'EX', customTtl || ttl);
+        const resolvedTtl = customTtl ?? resolveTtl(key);
+        await redis.set(key, JSON.stringify(entry), 'EX', resolvedTtl);
       } catch {
         // silently fail
       }
@@ -66,7 +76,18 @@ export function createCacheService({ strapi }: { strapi: Core.Strapi }) {
       const base = `cache:${uid}`;
       return params ? `${base}:${JSON.stringify(params)}` : base;
     },
+
+    getTtl(uid: string): number {
+      return contentTypeTtls[uid] ?? DEFAULT_TTL;
+    },
   };
+}
+
+function resolveTtl(key: string): number {
+  for (const [uid, ttl] of Object.entries(contentTypeTtls)) {
+    if (key.includes(uid)) return ttl;
+  }
+  return DEFAULT_TTL;
 }
 
 export type CacheService = ReturnType<typeof createCacheService>;

@@ -1,10 +1,20 @@
 import type { Core } from '@strapi/strapi';
 import { bootstrapMcp } from './modules/mcp';
+import { createCacheMiddleware } from './modules/system/controllers/cache.middleware';
+import { ensureIndexes } from './modules/system/services/migrations.service';
+import { ensureAuditTable } from './modules/system/services/setup.service';
 
 export default {
   register({ strapi }: { strapi: Core.Strapi }) {},
 
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    // ── DB Setup: indexes + audit table ──
+    await ensureIndexes({ strapi });
+    await ensureAuditTable({ strapi });
+
+    // ── Redis Cache Middleware ──
+    strapi.server.use(createCacheMiddleware({ strapi }));
+
     // ── Admin auto-creation on first run ──
     const email = process.env.STRAPI_ADMIN_EMAIL;
     const password = process.env.STRAPI_ADMIN_PASSWORD;
