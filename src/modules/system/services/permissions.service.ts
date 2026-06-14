@@ -13,6 +13,7 @@ const PUBLIC_ACTIONS = [
   'api::navigation.navigation.find',
   'api::search.search.search',
   'api::contact.contact.create',
+  'api::newsletter-subscription.newsletter-subscription.create',
 ];
 
 /**

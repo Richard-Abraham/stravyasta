@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_shared_team_grids",
+  "info": {
+    "displayName": "Team Grid",
+    "icon": "users",
+    "description": "Section with heading and grid of team members"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string"
+    },
+    "members": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.team-member"
+    }
+  }
+}

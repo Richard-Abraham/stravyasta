@@ -66,4 +66,26 @@ export async function seedContent({ strapi }: { strapi: Core.Strapi }) {
   }
 
   console.log('[SEED] Demo content seeded successfully!');
+} 
+
+export async function seedTheme({ strapi }: { strapi: Core.Strapi }) {
+  const existing = await strapi.entityService.findOne('api::theme-setting.theme-setting' as any, 1);
+  if (existing) {
+    console.log('[SEED] Theme already exists, skipping.');
+    return;
+  }
+
+  await strapi.entityService.create('api::theme-setting.theme-setting' as any, {
+    data: {
+      brandName: 'Sattva',
+      primaryColor: '#7C3AED',
+      secondaryColor: '#A855F7',
+      accentColor: '#F3E8FF',
+      fontFamily: 'Inter',
+      borderRadius: 'medium',
+      layoutStyle: 'default',
+      footerText: 'All rights reserved.',
+    } as any,
+  });
+  console.log('[SEED] Default theme created.');
 }

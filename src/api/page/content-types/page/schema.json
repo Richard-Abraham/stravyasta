@@ -33,7 +33,19 @@
     },
     "layout": {
       "type": "dynamiczone",
-      "components": ["shared.rich-text", "shared.image-gallery", "shared.cta", "shared.faq"],
+      "components": [
+  "shared.rich-text",
+  "shared.image-gallery",
+  "shared.cta",
+  "shared.faq",
+  "shared.hero",
+  "shared.card-grid",
+  "shared.content-with-image",
+  "shared.team-grid",
+  "shared.featured-articles",
+  "shared.community-links",
+  "shared.newsletter"
+],
       "pluginOptions": { "i18n": { "localized": true } }
     },
     "seo": {

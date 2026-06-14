@@ -38,6 +38,9 @@ describe('PermissionsService', () => {
     expect(create).toHaveBeenCalledWith({
       data: { action: 'api::contact.contact.create', role: 1 },
     });
+    expect(create).toHaveBeenCalledWith({
+      data: { action: 'api::newsletter-subscription.newsletter-subscription.create', role: 1 },
+    });
     expect(create.mock.calls.length).toBeGreaterThan(5);
   });
 
@@ -56,6 +59,7 @@ describe('PermissionsService', () => {
         'api::navigation.navigation.find',
         'api::search.search.search',
         'api::contact.contact.create',
+        'api::newsletter-subscription.newsletter-subscription.create',
       ],
     });
 

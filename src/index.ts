@@ -3,7 +3,7 @@ import { bootstrapMcp } from './modules/mcp';
 import { createCacheMiddleware } from './modules/system/controllers/cache.middleware';
 import { ensureIndexes } from './modules/system/services/migrations.service';
 import { ensureAuditTable } from './modules/system/services/setup.service';
-import { seedContent } from './seed';
+import { seedContent, seedTheme } from './seed';
 import { ensurePublicPermissions } from './modules/system/services/permissions.service';
 
 export default {
@@ -48,6 +48,7 @@ export default {
     // ── Demo content seeding (set SEED_DEMO=true) ──
     if (process.env.SEED_DEMO === 'true') {
       await seedContent({ strapi });
+      await seedTheme({ strapi });
     }
 
     // ── MCP server (gated by ENABLE_MCP=true) ──

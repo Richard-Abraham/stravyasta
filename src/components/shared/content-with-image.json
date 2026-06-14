@@ -1,0 +1,34 @@
+{
+  "collectionName": "components_shared_content_with_images",
+  "info": {
+    "displayName": "Content with Image",
+    "icon": "picture",
+    "description": "Two-column layout with rich text and image, optionally reversed"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "required": true
+    },
+    "body": {
+      "type": "richtext",
+      "required": true
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    },
+    "link": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.link"
+    },
+    "reversed": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

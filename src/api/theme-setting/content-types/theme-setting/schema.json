@@ -1,0 +1,73 @@
+{
+  "kind": "singleType",
+  "collectionName": "theme_settings",
+  "info": {
+    "singularName": "theme-setting",
+    "pluralName": "theme-settings",
+    "displayName": "Theme Setting",
+    "description": "Global theme and brand configuration — controls frontend appearance"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "brandName": {
+      "type": "string",
+      "default": "Sattva",
+      "maxLength": 50
+    },
+    "primaryColor": {
+      "type": "string",
+      "default": "#7C3AED",
+      "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+      "maxLength": 7
+    },
+    "secondaryColor": {
+      "type": "string",
+      "default": "#A855F7",
+      "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+      "maxLength": 7
+    },
+    "accentColor": {
+      "type": "string",
+      "default": "#F3E8FF",
+      "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+      "maxLength": 7
+    },
+    "fontFamily": {
+      "type": "enumeration",
+      "enum": ["Inter", "Roboto", "Open Sans", "Lato", "System UI"],
+      "default": "Inter"
+    },
+    "borderRadius": {
+      "type": "enumeration",
+      "enum": ["none", "small", "medium", "large"],
+      "default": "medium"
+    },
+    "layoutStyle": {
+      "type": "enumeration",
+      "enum": ["default", "wide", "boxed"],
+      "default": "default"
+    },
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "required": false
+    },
+    "favicon": {
+      "type": "media",
+      "multiple": false,
+      "required": false
+    },
+    "customCss": {
+      "type": "text",
+      "maxLength": 10000
+    },
+    "footerText": {
+      "type": "string",
+      "default": "All rights reserved.",
+      "maxLength": 200
+    }
+  }
+}

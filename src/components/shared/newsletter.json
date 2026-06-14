@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_shared_newsletters",
+  "info": {
+    "displayName": "Newsletter",
+    "icon": "mail",
+    "description": "Email signup section, placeable on any page"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "default": "Subscribe to our newsletter"
+    },
+    "text": {
+      "type": "text"
+    },
+    "placeholder": {
+      "type": "string",
+      "default": "Enter your email"
+    },
+    "buttonLabel": {
+      "type": "string",
+      "default": "Subscribe"
+    }
+  }
+}

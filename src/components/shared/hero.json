@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_shared_heros",
+  "info": {
+    "displayName": "Hero",
+    "icon": "layout",
+    "description": "Large page-top hero section with heading, image, and CTA links"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "required": true,
+      "maxLength": 150
+    },
+    "subheading": {
+      "type": "text"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "links": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.link"
+    }
+  }
+}

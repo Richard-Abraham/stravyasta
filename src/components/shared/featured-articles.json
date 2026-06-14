@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_shared_featured_articles",
+  "info": {
+    "displayName": "Featured Articles",
+    "icon": "pin",
+    "description": "Section with curated article selection"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string"
+    },
+    "articles": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::article.article"
+    }
+  }
+}

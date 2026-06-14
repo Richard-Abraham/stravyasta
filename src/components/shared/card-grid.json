@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_shared_card_grids",
+  "info": {
+    "displayName": "Card Grid",
+    "icon": "grid",
+    "description": "Section with a heading and grid of cards for features/services"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string"
+    },
+    "cards": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.card"
+    }
+  }
+}
