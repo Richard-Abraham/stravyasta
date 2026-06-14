@@ -6,5 +6,5 @@ export interface HealthStatus {
 
 export interface ReadinessStatus extends HealthStatus {
   db: 'ok' | 'fail';
-  redis?: 'ok' | 'fail';
+  redis?: 'ok' | 'fail' | 'skipped';
 }

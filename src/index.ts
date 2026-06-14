@@ -3,6 +3,8 @@ import { bootstrapMcp } from './modules/mcp';
 import { createCacheMiddleware } from './modules/system/controllers/cache.middleware';
 import { ensureIndexes } from './modules/system/services/migrations.service';
 import { ensureAuditTable } from './modules/system/services/setup.service';
+import { seedContent } from './seed';
+import { ensurePublicPermissions } from './modules/system/services/permissions.service';
 
 export default {
   register({ strapi }: { strapi: Core.Strapi }) {},
@@ -14,6 +16,9 @@ export default {
 
     // ── Redis Cache Middleware ──
     strapi.server.use(createCacheMiddleware({ strapi }));
+
+    // ── Public role read permissions (frontend API consumer) ──
+    await ensurePublicPermissions({ strapi });
 
     // ── Admin auto-creation on first run ──
     const email = process.env.STRAPI_ADMIN_EMAIL;
@@ -38,6 +43,11 @@ export default {
       } catch {
         // Admin service not ready yet
       }
+    }
+
+    // ── Demo content seeding (set SEED_DEMO=true) ──
+    if (process.env.SEED_DEMO === 'true') {
+      await seedContent({ strapi });
     }
 
     // ── MCP server (gated by ENABLE_MCP=true) ──

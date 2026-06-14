@@ -34,6 +34,10 @@ export function registerSSETransport(
     await mcpServer.connect(transport);
   });
 
+  app.get('/mcp/health', (req, res) => {
+    res.status(200).json({ status: 'ok' });
+  });
+
   app.post('/mcp/messages', express.json(), async (req, res) => {
     if (secret && req.headers['x-mcp-secret'] !== secret) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -49,7 +53,27 @@ export function registerSSETransport(
   });
 
   const port = parseInt(process.env.MCP_PORT || '3001', 10);
-  app.listen(port, () => {
+  const server = app.listen(port, () => {
     console.log(`[MCP] SSE transport listening on port ${port}`);
   });
+
+  const shutdown = (signal: string) => {
+    console.log(`[MCP] Received ${signal}, shutting down SSE transport...`);
+    for (const transport of transports.values()) {
+      void transport.close();
+    }
+    transports.clear();
+
+    server.close(() => {
+      console.log('[MCP] SSE transport closed');
+      process.exit(0);
+    });
+
+    setTimeout(() => process.exit(1), 10000);
+  };
+
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
+
+  return server;
 }

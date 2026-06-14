@@ -4,7 +4,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: vyasta
-      POSTGRES_PASSWORD: vyasta
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-vyasta}
       POSTGRES_DB: strapi
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -62,9 +62,9 @@ services:
       DATABASE_PORT: 5432
       DATABASE_NAME: strapi
       DATABASE_USERNAME: vyasta
-      DATABASE_PASSWORD: vyasta
-      AWS_ACCESS_KEY_ID: vyasta
-      AWS_ACCESS_SECRET: vyastapass
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-vyasta}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-vyasta}
+      AWS_ACCESS_SECRET: ${AWS_ACCESS_SECRET:-vyastapass}
       AWS_REGION: us-east-1
       S3_ENDPOINT: http://storage:8333
       S3_BUCKET: strapi-media
@@ -94,7 +94,7 @@ services:
       DATABASE_PORT: 5432
       DATABASE_NAME: strapi
       DATABASE_USERNAME: vyasta
-      DATABASE_PASSWORD: vyasta
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-vyasta}
       ENABLE_MCP: 'true'
       MCP_TRANSPORT: sse
       MCP_PORT: '3001'
@@ -105,6 +105,12 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/mcp/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
 volumes:
   pgdata:

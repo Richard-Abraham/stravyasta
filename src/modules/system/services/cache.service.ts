@@ -40,6 +40,16 @@ export function createCacheService({ strapi }: { strapi: Core.Strapi }) {
       return redis !== null && redis.status === 'ready';
     },
 
+    async ping(): Promise<'ok' | 'fail' | 'skipped'> {
+      if (!redis) return 'skipped';
+      try {
+        await redis.ping();
+        return 'ok';
+      } catch {
+        return 'fail';
+      }
+    },
+
     async get(key: string): Promise<CacheEntry | null> {
       if (!redis) return null;
       try {

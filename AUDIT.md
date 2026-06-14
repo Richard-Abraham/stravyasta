@@ -1165,3 +1165,59 @@ This application is considered production-ready when all CRITICAL and HIGH findi
 | `docker-compose.yml`                      | Add MCP healthcheck, use env vars for passwords     |
 | `.gitignore`                              | Add missing patterns (tsbuildinfo, .env.local, etc.)|
 | `src/index.ts`                            | Add environment variable validation on startup      |
+
+---
+
+## Re-Audit — June 2026
+
+**Re-Audit Date:** 2026-06-14
+**Context:** Follow-up review after a hardening pass and the build-out of `sattva-web` (the production frontend consuming this CMS). This section supersedes the per-finding status above where they conflict; the original findings are kept for historical traceability.
+
+### Status of Original Findings
+
+| # | Original Finding | Severity | Status | Evidence |
+|---|-------------------|----------|--------|----------|
+| 1 | Hardcoded secrets in `.env` | CRITICAL | **FIXED** | `.env.example` now uses `change-me` placeholders for `APP_KEYS`, `API_TOKEN_SALT`, `ADMIN_JWT_SECRET`, `TRANSFER_TOKEN_SALT`, `ENCRYPTION_KEY`, `STRAPI_ADMIN_PASSWORD` |
+| 2 | Wildcard CORS `origin: *` | CRITICAL | **FIXED** | `config/middlewares.ts` reads `CORS_ORIGIN` from env |
+| 3 | GraphQL introspection enabled | CRITICAL | **FIXED** | Gated by `GRAPHQL_INTROSPECTION` env (defaults to `false` in `.env.example`) |
+| 4 | MCP SSE static shared-secret auth | HIGH | **OPEN** | `src/modules/mcp/transport.ts` still compares `x-mcp-secret` with `!==` (non-constant-time); no rotation mechanism |
+| 5 | In-memory MCP rate limiter not shared across instances | HIGH | **PARTIAL** | `simpleRateLimiter` in `src/modules/mcp/server.ts` remains in-memory; acceptable for single-instance deploys, documented limitation |
+| 6 | Duplicate health route definitions | HIGH | **FIXED** | Dead route file removed; single source in `src/api/health/` |
+| 7 | CI suppresses dependency audit failures | HIGH | **FIXED** | `continue-on-error: true` removed from `.github/workflows/ci.yml` |
+| 8 | Review Workflows enabled (Enterprise-only) | HIGH | **FIXED** | `reviewWorkflows` removed from article/page schemas |
+| 9 | PostgreSQL password committed in plaintext | HIGH | **FIXED (this pass)** | `.env.example` `DATABASE_PASSWORD`/`AWS_ACCESS_KEY_ID`/`AWS_ACCESS_SECRET` now `change-me`; `docker-compose.yml` uses `${DATABASE_PASSWORD:-vyasta}` / `${AWS_ACCESS_KEY_ID:-vyasta}` / `${AWS_ACCESS_SECRET:-vyastapass}` interpolation so production can override via a root `.env` without editing the compose file |
+| 10 | `.gitignore` missing patterns | LOW | **FIXED** | `.gitignore` now covers `*.tsbuildinfo`, `.env.local`, etc. |
+| 11 | Article slug route ordering (`/articles/:id` shadowing `/articles/slug/:slug`) | MEDIUM | **FIXED** | `src/api/article/routes/article.ts` lists `/articles/slug/:slug` before `/articles/:id` |
+| 12 | No env validation at startup | MEDIUM | **OPEN** | `src/index.ts` bootstrap still has no startup check for placeholder/missing secrets |
+| 13 | Redis health check missing from readiness probe | MEDIUM | **FIXED (this pass)** | `cache.service.ts` now exposes `ping()`; `health.service.ts: getReadiness()` populates `ReadinessStatus.redis` (`'ok' \| 'fail' \| 'skipped'`) and degrades overall status if Redis ping fails |
+| 14 | No graceful shutdown for MCP SSE transport | MEDIUM | **FIXED (this pass)** | `transport.ts` now captures the `http.Server`, handles `SIGTERM`/`SIGINT`, closes all active SSE transports, and force-exits after a 10s timeout |
+| 15 | No PM2 / process manager config | LOW | **FIXED** | `ecosystem.config.js` added |
+| 16 | Shadow-CRUD content types (category/page/tag/navigation) lack custom controllers | MEDIUM | **PARTIAL** | Still using Strapi's default generated controllers; however a new `src/api/search/` was added providing Postgres full-text search (`ts_vector`/`plainto_tsquery`, with a `LIKE`-based fallback) — **not** the OpenAI-embedding semantic search originally scoped in the frontend BRD |
+| 17 | No MCP container healthcheck | MEDIUM | **FIXED (this pass)** | `transport.ts` exposes an unauthenticated `GET /mcp/health`; `docker-compose.yml` adds a `wget --spider` healthcheck for `strapi-mcp` |
+| — | **(New) Public role has no read permissions configured** | **HIGH** | **FIXED (this pass)** | New `src/modules/system/services/permissions.service.ts: ensurePublicPermissions()` runs on bootstrap and grants the Users & Permissions "Public" role `find`/`findOne` on `article`, `page`, `category`, `tag`, `navigation`, and the custom `search` action — without this, anonymous frontend reads of `page`/`category`/`tag`/`navigation` returned `403 Forbidden` (article/search were unaffected since their custom routes set `config: { auth: false }`) |
+| — | **(New) No `contact` content-type exists** | **HIGH** | **OPEN — out of scope this pass** | `sattva-web`'s `/contact` form posts to `/api/contacts`, but `src/api/` has no `contact` content-type at all. This is a frontend-blocking gap that needs a new Strapi content-type (schema + controller + Public `create` permission), not addressed in this P0 pass since it requires new schema design |
+
+### Additional Notes
+
+- `docker/seaweedfs/s3-config.json` still hardcodes the `vyasta`/`vyastapass` SeaweedFS identity matching the (now-templated) default docker-compose credentials. SeaweedFS reads this file directly with no env-substitution in the current entrypoint, so it cannot be templated without adding an `envsubst`-based entrypoint script. **Accepted as a known dev-stack limitation** — flag before using this compose file for a real production deployment (use a managed S3-compatible store with IAM-issued credentials instead).
+
+### Updated Severity Summary
+
+| Severity | Original Count | Still Open |
+|----------|-----------------|------------|
+| CRITICAL | 3 | 0 |
+| HIGH     | 7 (+2 new)  | 2 (MCP SSE auth, missing `contact` content-type) |
+| MEDIUM   | 12 | 2 (env validation at startup, shadow-CRUD controllers/PARTIAL) |
+| LOW      | 5  | 0 |
+| INFO     | 2  | 0 |
+
+### Updated Sign-off
+
+**Status: Conditionally Ready.** All CRITICAL findings and the database/storage credential HIGH finding are resolved. The CMS is safe to deploy behind the env-driven CORS/secrets configuration with Redis-aware readiness probes, graceful MCP shutdown, an MCP container healthcheck, and working anonymous read access for the frontend's content types.
+
+Before a full production sign-off, still required:
+1. Add the `contact` content-type (schema + Public `create` permission) so the frontend contact form works end-to-end.
+2. Harden MCP SSE auth (constant-time comparison, secret rotation) — relevant only when `ENABLE_MCP=true`.
+3. Add startup environment validation to fail fast on placeholder secrets in production.
+4. Move the MCP rate limiter to Redis if running multiple MCP instances.
+| `src/index.ts`                            | Add environment variable validation on startup      |
